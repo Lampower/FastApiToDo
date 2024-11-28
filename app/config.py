@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import punq
 
+from app.providers.encryption_provider import EncryptionProvider
+
 
 load_dotenv()
 
@@ -11,12 +13,8 @@ class Startup:
     port = int(os.getenv("PORT"))
     
 
-class Routes:
-    note_route = "/notes"
-    user_route = "/users"
-    
+
 class Settings:
-    routes = Routes()
     startup = Startup()
     
 settings = Settings()
@@ -25,3 +23,4 @@ settings = Settings()
 container = punq.Container()
 
 # container.register()
+container.register(EncryptionProvider)

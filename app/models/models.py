@@ -1,6 +1,7 @@
 
 
 
+from typing import Annotated, Any
 from pydantic import BaseModel
 
 
@@ -22,3 +23,8 @@ class TokenResponse(BaseModel):
     
 class CreateResponse(BaseModel):
     message: str
+    
+class ResponseModel(BaseModel):
+    errors: list[str]
+    is_success: bool
+    data: object

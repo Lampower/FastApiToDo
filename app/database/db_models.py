@@ -6,14 +6,14 @@ class Base(DeclarativeBase):
 
     pass
 
-class Note(Base):
+class NoteEntity(Base):
     __tablename__ = "note"
     
     title: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     author: Mapped[int] = mapped_column(ForeignKey("user.id"))
         
-class User(Base):
+class UserEntity(Base):
     __tablename__ = "user"
     
     login: Mapped[str] = mapped_column()
