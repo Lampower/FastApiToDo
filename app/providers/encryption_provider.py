@@ -1,15 +1,14 @@
 import bcrypt
 import os
+from app.config import settings
+
+salt = bcrypt.gensalt()
+
 
 class EncryptionProvider:
-
-    def __init__(self):
-        self.tobyte = os.getenv("SALT_KEY")
-        self.salt = self.tobyte.encode()
-        pass
     
     def encrypt(self, key: str) -> bytes:
-        hashed = bcrypt.hashpw(key.encode(), self.salt)
+        hashed = bcrypt.hashpw(key.encode(), salt)
         return hashed
     
     def verify(self, text_key, hashed_key) -> bool:

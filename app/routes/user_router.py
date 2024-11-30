@@ -21,19 +21,6 @@ async def get_user(id: int, res: Response):
         return 
     return note
 
-@router.post("create")
-async def create_user(user: UserRegister,  res: Response):
-    with session_scope() as s:
-        user_entity: UserEntity = UserEntity()
-        user_entity.login = user.login
-        user_entity.password = user.password
-        
-        s.query(UserEntity).add_entity(user_entity)
-    
-    res.status_code = status.HTTP_201_CREATED 
-       
-    return 
-
 @router.get("")
 async def get_all(res: Response):
     with session_scope() as s:

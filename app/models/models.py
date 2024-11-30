@@ -1,7 +1,7 @@
 
 
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Optional
 from pydantic import BaseModel
 
 
@@ -24,7 +24,14 @@ class TokenResponse(BaseModel):
 class CreateResponse(BaseModel):
     message: str
     
-class ResponseModel(BaseModel):
-    errors: list[str]
-    is_success: bool
-    data: object
+class Error(BaseModel):
+    message: str
+    
+class User(BaseModel):
+    id: int
+    login: str
+    
+class ResponseModel[T](BaseModel):
+    errors: Optional[list[str]] = []
+    is_success: bool = True
+    data: Optional[T | None]

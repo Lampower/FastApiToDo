@@ -13,6 +13,7 @@ python-dotenv = "^1.0.1"
 sqlalchemy = "^2.0.36"
 punq = "^0.7.0"
 bcrypt = "^4.2.1"
+pyjwt = "^2.10.1"
 
 [tool.poetry.scripts]
 start = "app.main:main"
