@@ -1,5 +1,6 @@
 poetry config virtualenvs.in-project true - global config to create env not in system cache but in project directory
 
+poetry env use %PATH_TO_PYTHON% - to recreate venv with python of needed version
 
 uvicorn main:app - to run app
 

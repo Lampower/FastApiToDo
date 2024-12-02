@@ -3,7 +3,6 @@ import time
 from typing import Any
 from app.models.models import User
 from app.config import settings
-from app.dependencies import container
 import jwt
 
 
@@ -14,17 +13,21 @@ class JwtProvider:
         self.access_exp = settings.jwt.access_exp_time
         self.refresh_exp = settings.jwt.refresh_exp_time
         self.algorythm = "HS256"
+        
+        print(self.refresh_key, self.access_key)
     
     def create_access_token(self, user: User):
-        payload = user
+        payload = vars(user)
         
-        token = self.__sign_token(payload, )
+        token = self.__sign_token(payload, 
+                                  self.access_exp, 
+                                  self.access_key)
         
         return token
     
     def verify_access_token(self, token: str = None):
         try:
-            decoded: User = self.jwt.decode(token, 
+            decoded: User = jwt.decode(token, 
                                       self.access_key, 
                                       self.algorythm
                                       )
@@ -33,16 +36,28 @@ class JwtProvider:
             return None
         
     def create_refresh_token(self, user: User):
-        payload = user
+        payload = vars(user)
         
-        token = self.jwt.encode(payload, 
-                                self.access_key, 
-                                self.algorythm
-                                )
+        token = self.__sign_token(payload, 
+                                  self.refresh_exp, 
+                                  self.refresh_key)
+        
+        return token
+    
+    def verify_refresh_token(self, token: str = None):
+        try:
+            decoded_payload: dict[str, Any] = jwt.decode(token, 
+                                      self.refresh_key, 
+                                      self.algorythm
+                                      )
+            user: User = User(id=decoded_payload["id"], login=decoded_payload["login"])
+            return user
+        except:
+            return None
         
     def __sign_token(self,
         payload: dict[str, Any]={},
-        ttl: timedelta=None,
+        exp: int = 1,
         key: str = None
         ) -> str:
         """
@@ -54,21 +69,26 @@ class JwtProvider:
         """
         # Берём текущее UNIX время
         current_timestamp = int(datetime.now().timestamp())
+        
+        exp_time = self.add_time_to_now(exp)
             
         # Собираем полезную нагрузку токена:
         data = dict(
             # Указываем себя в качестве издателя
             iss='test_author',
-            # Рандомно генерируем идентификатор токена ( UUID )
-            jti=self.__generate_jti(),
             # Временем выдачи ставим текущее
             iat=current_timestamp, 
-            # Временем начала действия токена ставим текущее или то, что было передано в payload
-            nbf=payload['nbf'] if payload.get('nbf') else current_timestamp
+            exp=exp_time
         )
         # Добавляем exp- время, после которого токен станет невалиден, если был передан ttl
-        data.update(dict(exp=data['nbf'] + int(ttl.total_seconds()))) if ttl else None
         # Изначальный payload обновляем получившимся словарём
         payload.update(data)
         
         return jwt.encode(payload=payload, key=key, algorithm='HS256')
+    
+    def add_time_to_now(self, minutes: int):
+        minutes_to_add = timedelta(minutes=minutes)
+        return int((datetime.now() + minutes_to_add).timestamp())
+    
+    def get_now_as_timestamp(self):
+        return int(datetime.now().timestamp())
